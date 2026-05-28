@@ -2,93 +2,222 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Noitseuq</title>
     <style>
-        body { font-family: sans-serif; text-align: center; margin-top: 30px; background: #fafafa;}
+        /* Base e Reset */
+        * { box-sizing: border-box; }
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f4f7fb; 
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        /* Titolo Principale */
+        h1 { font-size: 2.5rem; margin: 10px 0 5px 0; color: #1565c0; letter-spacing: -1px; }
+        .sottotitolo { color: #666; margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; }
+
+        /* Utility */
         .nascosto { display: none !important; }
         
-        .schermata { padding: 30px; border-radius: 10px; display: inline-block; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        #menu-iniziale { background: #ffffff; }
-        #sala-attesa { background: #f0f0f0; }
-        #fase-scrittura { background: #e3f2fd; }
-        #fase-votazione { background: #fff3e0; }
-        #fase-classifica { background: #e8f5e9; }
+        /* Stile Card (Le schermate morbide) */
+        .schermata { 
+            background: #ffffff; 
+            padding: 30px 20px; 
+            border-radius: 24px; 
+            width: 100%;
+            max-width: 450px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            margin-bottom: 20px;
+        }
+
+        /* Colori per le diverse fasi */
+        #fase-scrittura { background: #f0f7ff; border: 2px solid #e3f2fd; }
+        #fase-votazione { background: #fffcf0; border: 2px solid #fff3e0; }
+        #fase-classifica { background: #f2fbf3; border: 2px solid #e8f5e9; }
         
-        #timer-display { font-size: 24px; font-weight: bold; color: red; }
-        .risposta-target { font-size: 32px; font-weight: bold; color: #1565c0; margin: 20px 0; padding: 15px; border: 2px dashed #1565c0; background: white;}
-        .btn-voto { padding: 15px 25px; font-size: 45px; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s;}
-        .btn-voto:hover { transform: scale(1.1); }
-        input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
-        button { padding: 8px 15px; border-radius: 4px; border: none; background: #333; color: white; cursor: pointer; }
-        button:hover { background: #555; }
+        /* Input Testuali (Morbidi e larghi) */
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            border: 2px solid #e0e0e0;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: border 0.3s;
+            outline: none;
+            background: #fafafa;
+        }
+        input:focus { border-color: #1565c0; background: #fff; }
+
+        /* Bottoni */
+        button { 
+            width: 100%;
+            padding: 16px; 
+            border-radius: 16px; 
+            border: none; 
+            font-size: 18px; 
+            font-weight: bold;
+            color: white; 
+            cursor: pointer; 
+            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+        button:active { transform: scale(0.96); } /* Effetto "schiacciamento" al tocco */
+        
+        /* Colori Bottoni */
+        .btn-blu { background: #1565c0; }
+        .btn-arancione { background: #e65100; }
+        .btn-verde { background: #2e7d32; }
+        .btn-grigio { background: #757575; }
+
+        /* Layout Menu Iniziale */
+        .sezione-menu { padding: 15px 0; }
+        .divider { border-top: 2px dashed #eee; margin: 10px 0; }
+        .input-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;}
+        .input-group label { font-weight: bold; color: #555;}
+        .input-group input { width: 80px; margin-bottom: 0;}
+
+        /* Elementi Speciali di Gioco */
+        #timer-display { font-size: 28px; font-weight: 900; color: #ef5350; background: #ffebee; padding: 5px 15px; border-radius: 20px; display: inline-block;}
+        .risposta-target { 
+            font-size: 26px; 
+            font-weight: 900; 
+            color: #1565c0; 
+            margin: 20px 0; 
+            padding: 20px; 
+            border: 3px dashed #1565c0; 
+            background: rgba(255,255,255,0.7);
+            border-radius: 20px;
+            word-wrap: break-word;
+        }
+        
+        /* Bottoni Voto Faccine */
+        .area-voti { display: flex; gap: 15px; justify-content: center; margin-top: 15px;}
+        .btn-voto { 
+            flex: 1; /* Occupa lo stesso spazio */
+            padding: 15px 0; 
+            font-size: 40px; 
+            border-radius: 20px; 
+            margin-bottom: 0;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+        .btn-voto[data-voto="1"] { background: #ef5350; }
+        .btn-voto[data-voto="2"] { background: #ffca28; }
+        .btn-voto[data-voto="3"] { background: #66bb6a; }
+
+        /* Classifica */
+        #lista-classifica { list-style: none; padding: 0; margin: 0; }
+        #lista-classifica li {
+            font-size: 1.2rem;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Messaggi di stato */
+        .msg-attesa { color: #2e7d32; font-weight: bold; font-size: 1.1rem; margin-top: 15px; background: #e8f5e9; padding: 12px; border-radius: 12px;}
     </style>
 </head>
 <body>
-    <h1 style="font-size: 3rem; margin-bottom: 5px;">NOITSEUQ</h1>
-    <p style="color: #666; margin-top: 0;">Trova la domanda perfetta.</p>
+    <h1>NOITSEUQ</h1>
+    <p class="sottotitolo">Trova la domanda perfetta.</p>
     
     <div id="menu-iniziale" class="schermata">
-        <div style="margin-bottom: 20px;">
-            <label><strong>Il tuo Nome: </strong><input type="text" id="input-nome" placeholder="es. Mario" style="font-size: 18px; text-align: center; width: 150px;"></label>
+        <div class="sezione-menu">
+            <label style="font-weight: bold; display: block; margin-bottom: 10px; font-size: 1.1rem;">Come ti chiami?</label>
+            <input type="text" id="input-nome" placeholder="Inserisci il tuo nome">
         </div>
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
         
-        <div style="display: flex; gap: 40px; justify-content: center; text-align: left;">
-            <div>
-                <h3 style="color: #1565c0;">Host - Crea Partita</h3>
-                <label>Tempo (sec): <input type="number" id="input-tempo" value="45" style="width: 50px;"></label><br><br>
-                <label>Round: <input type="number" id="input-round" value="3" style="width: 50px;"></label><br><br>
-                <button id="btn-crea" style="background: #1565c0;">Crea Nuova Stanza</button>
+        <div class="divider"></div>
+        
+        <div class="sezione-menu">
+            <h3 style="color: #e65100; margin-top: 0;">Unisciti agli amici</h3>
+            <input type="text" id="input-codice" placeholder="Codice Stanza (es. A1B2)" maxlength="4" style="text-transform: uppercase;">
+            <button id="btn-entra" class="btn-arancione">Entra nella Partita</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="sezione-menu">
+            <h3 style="color: #1565c0; margin-top: 0;">Crea una nuova</h3>
+            <div class="input-group">
+                <label>Tempo (sec)</label>
+                <input type="number" id="input-tempo" value="45">
             </div>
-            
-            <div style="border-left: 1px solid #eee; padding-left: 40px;">
-                <h3 style="color: #e65100;">Giocatore - Entra</h3>
-                <input type="text" id="input-codice" placeholder="Codice (es. A1B2)" maxlength="4" style="text-transform: uppercase; margin-bottom: 15px; width: 120px;"><br>
-                <button id="btn-entra" style="background: #e65100;">Entra nella Stanza</button>
+            <div class="input-group">
+                <label>Round</label>
+                <input type="number" id="input-round" value="3">
             </div>
+            <button id="btn-crea" class="btn-blu">Crea Stanza Host</button>
         </div>
     </div>
 
     <div id="sala-attesa" class="schermata nascosto">
-        <h2>Codice Stanza: <span id="display-codice" style="color: blue; font-size: 2rem;"></span></h2>
-        <p>Amici connessi: <strong id="display-giocatori" style="font-size: 1.5rem;">1</strong></p>
-        <p>In attesa che l'Host avvii la partita...</p>
-        <button id="btn-inizia" class="nascosto" style="padding: 15px 30px; font-size: 18px; background: #2e7d32; color: white;">AVVIA IL GIOCO</button>
+        <p style="margin-bottom: 5px; color: #666; font-weight: bold;">Codice Stanza:</p>
+        <h2 id="display-codice" style="color: #1565c0; font-size: 3rem; margin: 0 0 20px 0; letter-spacing: 3px;"></h2>
+        
+        <div style="background: #f5f5f5; padding: 15px; border-radius: 16px; margin-bottom: 20px;">
+            <p style="margin: 0; font-size: 1.2rem;">Amici connessi: <strong id="display-giocatori" style="font-size: 1.5rem; color: #2e7d32;">1</strong></p>
+        </div>
+        
+        <p style="color: #666;">In attesa che l'Host avvii la partita...</p>
+        <button id="btn-inizia" class="btn-verde nascosto">AVVIA IL GIOCO</button>
     </div>
 
     <div id="fase-scrittura" class="schermata nascosto">
-        <h3 style="color: #666;">Round <span id="display-round"></span> di <span id="display-totale-round"></span></h3>
-        <p style="font-size: 1.2rem;">La risposta è:</p>
+        <h4 style="color: #666; margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Round <span id="display-round"></span> di <span id="display-totale-round"></span></h4>
+        
+        <p style="font-size: 1.2rem; margin-bottom: 0;">La risposta è:</p>
         <div class="risposta-target" id="testo-risposta-target"></div>
-        <p>Qual è la domanda? Hai <span id="timer-display"></span> secondi!</p>
-        <input type="text" id="input-domanda" placeholder="Es: Qual è il tuo colore preferito?" style="width: 80%; padding: 15px; font-size: 18px;">
-        <br><br>
-        <button id="btn-invia-domanda" style="padding: 10px 20px; font-size: 16px; background: #1565c0;">Invia Domanda</button>
-        <p id="messaggio-attesa" class="nascosto" style="color: #2e7d32; font-weight: bold; margin-top: 15px;">In attesa degli altri giocatori...</p>
+        
+        <p style="font-weight: bold;">Qual è la domanda?</p>
+        <div style="margin-bottom: 20px;">Tempo rimasto: <span id="timer-display"></span></div>
+        
+        <input type="text" id="input-domanda" placeholder="Es: Qual è il tuo colore preferito?">
+        
+        <button id="btn-invia-domanda" class="btn-blu">Invia Domanda</button>
+        <div id="messaggio-attesa" class="msg-attesa nascosto">In attesa degli altri...</div>
     </div>
 
     <div id="fase-votazione" class="schermata nascosto">
-        <h3 style="color: #666;">Vota: <span id="display-num-domanda"></span> di <span id="display-tot-domande"></span></h3>
-        <p>Risposta: <strong id="risposta-ricordo" style="color:#1565c0; font-size: 1.2rem;"></strong></p>
+        <h4 style="color: #666; margin-top: 0; text-transform: uppercase;">Vota: <span id="display-num-domanda"></span> di <span id="display-tot-domande"></span></h4>
         
-        <div class="risposta-target" id="testo-domanda-votazione" style="border-color: #e65100; color: #e65100;"></div>
+        <p style="margin-bottom: 5px;">Risposta originaria:</p>
+        <strong id="risposta-ricordo" style="color:#1565c0; font-size: 1.3rem; display: block; margin-bottom: 20px;"></strong>
         
-        <p style="font-size: 1.2rem; margin-bottom: 20px;">Dai un punteggio a questa domanda:</p>
-        <div id="pulsanti-voto" style="display: flex; gap: 15px; justify-content: center;">
-            <button class="btn-voto" data-voto="1" style="background: #ef5350;" title="1 Punto">😬</button>
-            <button class="btn-voto" data-voto="2" style="background: #ffca28;" title="2 Punti">🙂</button>
-            <button class="btn-voto" data-voto="3" style="background: #66bb6a;" title="3 Punti">🤩</button>
+        <div class="risposta-target" id="testo-domanda-votazione" style="border-color: #e65100; color: #e65100; background: #fff8e1;"></div>
+        
+        <p style="font-size: 1.2rem; font-weight: bold; margin-bottom: 10px;">Vota questa domanda:</p>
+        
+        <div id="pulsanti-voto" class="area-voti">
+            <button class="btn-voto" data-voto="1" title="1 Punto">😬</button>
+            <button class="btn-voto" data-voto="2" title="2 Punti">🙂</button>
+            <button class="btn-voto" data-voto="3" title="3 Punti">🤩</button>
         </div>
-        <p id="messaggio-voto-attesa" class="nascosto" style="color: #2e7d32; font-weight: bold; font-size: 18px;">Voto registrato. In attesa degli altri...</p>
+        <div id="messaggio-voto-attesa" class="msg-attesa nascosto">Voto registrato. In attesa degli altri...</div>
     </div>
 
-    <div id="fase-classifica" class="schermata nascosto" style="min-width: 300px;">
-        <h2 id="titolo-classifica" style="color: #2e7d32; font-size: 2rem;">Classifica Round</h2>
-        <ul id="lista-classifica" style="list-style-type: none; padding: 0; font-size: 1.5rem; text-align: left;">
+    <div id="fase-classifica" class="schermata nascosto">
+        <h2 id="titolo-classifica" style="color: #2e7d32; font-size: 2rem; margin-top: 0;">Classifica Round</h2>
+        <ul id="lista-classifica">
             </ul>
-        <p id="messaggio-prossimo-round" style="color: #666; margin-top: 20px;">Prossimo round in arrivo...</p>
-        <button id="btn-ricarica" class="nascosto" onclick="location.reload()" style="padding: 10px 20px; font-size: 16px; margin-top: 20px;">Torna al Menu Principale</button>
+        <p id="messaggio-prossimo-round" style="color: #666; margin-top: 25px; font-style: italic;">Prossimo round in arrivo...</p>
+        <button id="btn-ricarica" class="btn-grigio nascosto" onclick="location.reload()" style="margin-top: 15px;">Torna al Menu</button>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -105,7 +234,6 @@
             document.getElementById('fase-classifica').classList.add('nascosto');
         }
 
-        // --- AZIONI MENU ---
         document.getElementById('btn-crea').addEventListener('click', () => {
             const nome = document.getElementById('input-nome').value;
             const tempo = document.getElementById('input-tempo').value;
@@ -123,7 +251,6 @@
             socket.emit('richiestaInizioGioco', mioCodiceStanza);
         });
 
-        // --- AZIONI GIOCO ---
         document.getElementById('btn-invia-domanda').addEventListener('click', () => {
             const testoDomanda = document.getElementById('input-domanda').value;
             if (testoDomanda.trim() !== "") {
@@ -144,7 +271,6 @@
             });
         });
 
-        // --- RICEZIONE DAL SERVER ---
         socket.on('partitaCreata', (codice) => {
             mioCodiceStanza = codice;
             nascondiTutto();
@@ -200,10 +326,9 @@
             nascondiTutto();
             document.getElementById('fase-votazione').classList.remove('nascosto');
             
-            // CONTROLLO AUTORE: Nascondiamo i bottoni se la domanda l'abbiamo scritta noi
             if (socket.id === dati.autore) {
                 document.getElementById('pulsanti-voto').classList.add('nascosto');
-                document.getElementById('messaggio-voto-attesa').innerText = "Questa è la tua domanda! Attendi i voti degli altri...";
+                document.getElementById('messaggio-voto-attesa').innerText = "Questa è la tua domanda! Attendi i voti...";
                 document.getElementById('messaggio-voto-attesa').classList.remove('nascosto');
             } else {
                 document.getElementById('pulsanti-voto').classList.remove('nascosto');
@@ -216,7 +341,6 @@
             document.getElementById('testo-domanda-votazione').innerText = dati.testoDomanda;
         });
 
-        // MOSTRA CLASSIFICA
         socket.on('fineRound', (dati) => {
             nascondiTutto();
             document.getElementById('fase-classifica').classList.remove('nascosto');
@@ -231,9 +355,7 @@
                 else if (index === 1) medaglia = "🥈 ";
                 else if (index === 2) medaglia = "🥉 ";
                 
-                li.innerHTML = `<strong>${medaglia}${giocatore.nome}</strong>: ${giocatore.punti} Punti`;
-                li.style.padding = "10px";
-                li.style.borderBottom = "1px solid #ccc";
+                li.innerHTML = `<span><strong>${medaglia}${giocatore.nome}</strong></span> <span><strong>${giocatore.punti}</strong> pt</span>`;
                 lista.appendChild(li);
             });
 
@@ -250,7 +372,6 @@
             document.getElementById('titolo-classifica').innerHTML = `🏆 HA VINTO ${vincitore.nome.toUpperCase()}! 🏆`;
             document.getElementById('btn-ricarica').classList.remove('nascosto');
         });
-
     </script>
 </body>
 </html>
