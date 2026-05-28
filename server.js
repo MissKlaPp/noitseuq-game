@@ -11,7 +11,34 @@ const io = new Server(server);
 app.use(express.static(path.join(__dirname, 'public')));
 
 const stanze = {};
-const risposteCasuali = ["Giallo", "12", "Ogni tanto", "Solo la domenica", "Mio cugino", "Un pinguino", "Assolutamente no", "3,14", "La pizza all'ananas", "Il 1998"];
+const risposteCasuali = [
+    // Le originali
+    "Giallo", "12", "Ogni tanto", "Solo la domenica", "Mio cugino", "Un pinguino", "Assolutamente no", "3,14", "La pizza all'ananas", "Il 1998",
+    
+    // Azioni e Situazioni imbarazzanti o strane
+    "Mentre piango", "Sotto la doccia", "Completamente nudo", "Con le mani sporche", "Mentre dormo", "Scappando dalla polizia", "Di nascosto", "Solo se mi pagano", "Mentre guardo il muro",
+    
+    // Cibo e Bevande
+    "Un kebab alle 4 di mattina", "L'acqua di cottura della pasta", "Un pacchetto di Fonzies", "Il cibo per gatti", "Un litro di caffè", "La crosta della pizza", "Acqua frizzante calda",
+    
+    // Persone e Personaggi
+    "La suocera", "Gerry Scotti", "Il mio commercialista", "Un tizio in monopattino", "Batman", "L'idraulico", "Il Papa", "Mia nonna", "L'ex", "Un alieno",
+    
+    // Numeri, Misure e Denaro
+    "Quarantadue", "Meno di zero", "Tre milioni di euro", "Otto ore al giorno", "666", "Venti centesimi", "Più di 100 kg", "Un metro e un barattolo",
+    
+    // Luoghi
+    "Nel bagno dell'Autogrill", "In tangenziale", "A casa di mia nonna", "In prigione", "Sotto il letto", "Nel Molise", "Al discount", "All'inferno", "Sul divano",
+    
+    // Tempistiche
+    "Tutti i giovedì", "Nel 2050", "Tra cinque minuti", "Mai più nella vita", "Quando andrò in pensione", "Ieri sera", "Dal lunedì al venerdì", "Una volta all'anno",
+    
+    // Oggetti
+    "Un calzino spaiato", "La carta igienica", "Un mattone", "Il router del Wi-Fi", "Una spada laser", "Lo spazzolino da denti", "Le chiavi della macchina", "Un Nokia 3310",
+    
+    // Frasi fatte / Giustificazioni
+    "Non è colpa mia", "Avevo bevuto troppo", "Me l'ha prescritto il medico", "È stato un incidente", "Per pagare il mutuo", "Solo per i soldi", "Peggio di così non poteva andare", "Non è come sembra", "Chiedilo a tua madre"
+];
 
 function generaCodice() {
     const caratteri = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
