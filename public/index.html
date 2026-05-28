@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noitseuq</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 30px; background: #fafafa;}
+        .nascosto { display: none !important; }
+        
+        .schermata { padding: 30px; border-radius: 10px; display: inline-block; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #menu-iniziale { background: #ffffff; }
+        #sala-attesa { background: #f0f0f0; }
+        #fase-scrittura { background: #e3f2fd; }
+        #fase-votazione { background: #fff3e0; }
+        #fase-classifica { background: #e8f5e9; }
+        
+        #timer-display { font-size: 24px; font-weight: bold; color: red; }
+        .risposta-target { font-size: 32px; font-weight: bold; color: #1565c0; margin: 20px 0; padding: 15px; border: 2px dashed #1565c0; background: white;}
+        .btn-voto { padding: 15px 25px; font-size: 45px; border: none; border-radius: 10px; cursor: pointer; transition: 0.2s;}
+        .btn-voto:hover { transform: scale(1.1); }
+        input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+        button { padding: 8px 15px; border-radius: 4px; border: none; background: #333; color: white; cursor: pointer; }
+        button:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <h1 style="font-size: 3rem; margin-bottom: 5px;">NOITSEUQ</h1>
+    <p style="color: #666; margin-top: 0;">Trova la domanda perfetta.</p>
+    
+    <div id="menu-iniziale" class="schermata">
+        <div style="margin-bottom: 20px;">
+            <label><strong>Il tuo Nome: </strong><input type="text" id="input-nome" placeholder="es. Mario" style="font-size: 18px; text-align: center; width: 150px;"></label>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <div style="display: flex; gap: 40px; justify-content: center; text-align: left;">
+            <div>
+                <h3 style="color: #1565c0;">Host - Crea Partita</h3>
+                <label>Tempo (sec): <input type="number" id="input-tempo" value="45" style="width: 50px;"></label><br><br>
+                <label>Round: <input type="number" id="input-round" value="3" style="width: 50px;"></label><br><br>
+                <button id="btn-crea" style="background: #1565c0;">Crea Nuova Stanza</button>
+            </div>
+            
+            <div style="border-left: 1px solid #eee; padding-left: 40px;">
+                <h3 style="color: #e65100;">Giocatore - Entra</h3>
+                <input type="text" id="input-codice" placeholder="Codice (es. A1B2)" maxlength="4" style="text-transform: uppercase; margin-bottom: 15px; width: 120px;"><br>
+                <button id="btn-entra" style="background: #e65100;">Entra nella Stanza</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sala-attesa" class="schermata nascosto">
+        <h2>Codice Stanza: <span id="display-codice" style="color: blue; font-size: 2rem;"></span></h2>
+        <p>Amici connessi: <strong id="display-giocatori" style="font-size: 1.5rem;">1</strong></p>
+        <p>In attesa che l'Host avvii la partita...</p>
+        <button id="btn-inizia" class="nascosto" style="padding: 15px 30px; font-size: 18px; background: #2e7d32; color: white;">AVVIA IL GIOCO</button>
+    </div>
+
+    <div id="fase-scrittura" class="schermata nascosto">
+        <h3 style="color: #666;">Round <span id="display-round"></span> di <span id="display-totale-round"></span></h3>
+        <p style="font-size: 1.2rem;">La risposta è:</p>
+        <div class="risposta-target" id="testo-risposta-target"></div>
+        <p>Qual è la domanda? Hai <span id="timer-display"></span> secondi!</p>
+        <input type="text" id="input-domanda" placeholder="Es: Qual è il tuo colore preferito?" style="width: 80%; padding: 15px; font-size: 18px;">
+        <br><br>
+        <button id="btn-invia-domanda" style="padding: 10px 20px; font-size: 16px; background: #1565c0;">Invia Domanda</button>
+        <p id="messaggio-attesa" class="nascosto" style="color: #2e7d32; font-weight: bold; margin-top: 15px;">In attesa degli altri giocatori...</p>
+    </div>
+
+    <div id="fase-votazione" class="schermata nascosto">
+        <h3 style="color: #666;">Vota: <span id="display-num-domanda"></span> di <span id="display-tot-domande"></span></h3>
+        <p>Risposta: <strong id="risposta-ricordo" style="color:#1565c0; font-size: 1.2rem;"></strong></p>
+        
+        <div class="risposta-target" id="testo-domanda-votazione" style="border-color: #e65100; color: #e65100;"></div>
+        
+        <p style="font-size: 1.2rem; margin-bottom: 20px;">Dai un punteggio a questa domanda:</p>
+        <div id="pulsanti-voto" style="display: flex; gap: 15px; justify-content: center;">
+            <button class="btn-voto" data-voto="1" style="background: #ef5350;" title="1 Punto">😬</button>
+            <button class="btn-voto" data-voto="2" style="background: #ffca28;" title="2 Punti">🙂</button>
+            <button class="btn-voto" data-voto="3" style="background: #66bb6a;" title="3 Punti">🤩</button>
+        </div>
+        <p id="messaggio-voto-attesa" class="nascosto" style="color: #2e7d32; font-weight: bold; font-size: 18px;">Voto registrato. In attesa degli altri...</p>
+    </div>
+
+    <div id="fase-classifica" class="schermata nascosto" style="min-width: 300px;">
+        <h2 id="titolo-classifica" style="color: #2e7d32; font-size: 2rem;">Classifica Round</h2>
+        <ul id="lista-classifica" style="list-style-type: none; padding: 0; font-size: 1.5rem; text-align: left;">
+            </ul>
+        <p id="messaggio-prossimo-round" style="color: #666; margin-top: 20px;">Prossimo round in arrivo...</p>
+        <button id="btn-ricarica" class="nascosto" onclick="location.reload()" style="padding: 10px 20px; font-size: 16px; margin-top: 20px;">Torna al Menu Principale</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let mioCodiceStanza = "";
+        let intervalloTimer;
+
+        function nascondiTutto() {
+            document.getElementById('menu-iniziale').classList.add('nascosto');
+            document.getElementById('sala-attesa').classList.add('nascosto');
+            document.getElementById('fase-scrittura').classList.add('nascosto');
+            document.getElementById('fase-votazione').classList.add('nascosto');
+            document.getElementById('fase-classifica').classList.add('nascosto');
+        }
+
+        // --- AZIONI MENU ---
+        document.getElementById('btn-crea').addEventListener('click', () => {
+            const nome = document.getElementById('input-nome').value;
+            const tempo = document.getElementById('input-tempo').value;
+            const round = document.getElementById('input-round').value;
+            socket.emit('creaPartita', { nome: nome, impostazioni: { tempo: tempo, round: round } });
+        });
+
+        document.getElementById('btn-entra').addEventListener('click', () => {
+            const nome = document.getElementById('input-nome').value;
+            const codice = document.getElementById('input-codice').value;
+            if(codice.length > 0) socket.emit('entraPartita', { nome: nome, codice: codice });
+        });
+
+        document.getElementById('btn-inizia').addEventListener('click', () => {
+            socket.emit('richiestaInizioGioco', mioCodiceStanza);
+        });
+
+        // --- AZIONI GIOCO ---
+        document.getElementById('btn-invia-domanda').addEventListener('click', () => {
+            const testoDomanda = document.getElementById('input-domanda').value;
+            if (testoDomanda.trim() !== "") {
+                socket.emit('inviaDomanda', { codice: mioCodiceStanza, domanda: testoDomanda });
+                document.getElementById('input-domanda').disabled = true;
+                document.getElementById('btn-invia-domanda').disabled = true;
+                document.getElementById('messaggio-attesa').classList.remove('nascosto');
+            }
+        });
+
+        document.querySelectorAll('.btn-voto').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const voto = e.currentTarget.getAttribute('data-voto');
+                socket.emit('inviaVoto', { codice: mioCodiceStanza, voto: voto });
+                document.getElementById('pulsanti-voto').classList.add('nascosto');
+                document.getElementById('messaggio-voto-attesa').innerText = "Voto registrato. In attesa degli altri...";
+                document.getElementById('messaggio-voto-attesa').classList.remove('nascosto');
+            });
+        });
+
+        // --- RICEZIONE DAL SERVER ---
+        socket.on('partitaCreata', (codice) => {
+            mioCodiceStanza = codice;
+            nascondiTutto();
+            document.getElementById('sala-attesa').classList.remove('nascosto');
+            document.getElementById('display-codice').innerText = codice;
+            document.getElementById('btn-inizia').classList.remove('nascosto');
+        });
+
+        socket.on('ingressoConfermato', (codice) => {
+            mioCodiceStanza = codice;
+            nascondiTutto();
+            document.getElementById('sala-attesa').classList.remove('nascosto');
+            document.getElementById('display-codice').innerText = codice;
+        });
+
+        socket.on('aggiornamentoGiocatori', (numero) => {
+            document.getElementById('display-giocatori').innerText = numero;
+        });
+
+        socket.on('nuovoRound', (dati) => {
+            nascondiTutto();
+            document.getElementById('fase-scrittura').classList.remove('nascosto');
+            
+            document.getElementById('input-domanda').disabled = false;
+            document.getElementById('input-domanda').value = "";
+            document.getElementById('btn-invia-domanda').disabled = false;
+            document.getElementById('messaggio-attesa').classList.add('nascosto');
+
+            document.getElementById('display-round').innerText = dati.round;
+            document.getElementById('display-totale-round').innerText = dati.totaleRound;
+            document.getElementById('testo-risposta-target').innerText = dati.risposta;
+            
+            let tempoRimanente = dati.tempo;
+            document.getElementById('timer-display').innerText = tempoRimanente;
+            
+            clearInterval(intervalloTimer);
+            intervalloTimer = setInterval(() => {
+                tempoRimanente--;
+                document.getElementById('timer-display').innerText = tempoRimanente;
+                if (tempoRimanente <= 0) clearInterval(intervalloTimer);
+            }, 1000);
+        });
+
+        socket.on('fineTempoScrittura', () => {
+            clearInterval(intervalloTimer);
+            document.getElementById('input-domanda').disabled = true;
+            document.getElementById('btn-invia-domanda').disabled = true;
+            document.getElementById('messaggio-attesa').innerText = "Tempo Scaduto! Elaborazione...";
+            document.getElementById('messaggio-attesa').classList.remove('nascosto');
+        });
+
+        socket.on('mostraDomandaVotazione', (dati) => {
+            nascondiTutto();
+            document.getElementById('fase-votazione').classList.remove('nascosto');
+            
+            // CONTROLLO AUTORE: Nascondiamo i bottoni se la domanda l'abbiamo scritta noi
+            if (socket.id === dati.autore) {
+                document.getElementById('pulsanti-voto').classList.add('nascosto');
+                document.getElementById('messaggio-voto-attesa').innerText = "Questa è la tua domanda! Attendi i voti degli altri...";
+                document.getElementById('messaggio-voto-attesa').classList.remove('nascosto');
+            } else {
+                document.getElementById('pulsanti-voto').classList.remove('nascosto');
+                document.getElementById('messaggio-voto-attesa').classList.add('nascosto');
+            }
+
+            document.getElementById('display-num-domanda').innerText = dati.indice;
+            document.getElementById('display-tot-domande').innerText = dati.totaleDomande;
+            document.getElementById('risposta-ricordo').innerText = dati.rispostaOriginale;
+            document.getElementById('testo-domanda-votazione').innerText = dati.testoDomanda;
+        });
+
+        // MOSTRA CLASSIFICA
+        socket.on('fineRound', (dati) => {
+            nascondiTutto();
+            document.getElementById('fase-classifica').classList.remove('nascosto');
+            
+            const lista = document.getElementById('lista-classifica');
+            lista.innerHTML = ""; 
+            
+            dati.classifica.forEach((giocatore, index) => {
+                const li = document.createElement('li');
+                let medaglia = "";
+                if (index === 0) medaglia = "🥇 ";
+                else if (index === 1) medaglia = "🥈 ";
+                else if (index === 2) medaglia = "🥉 ";
+                
+                li.innerHTML = `<strong>${medaglia}${giocatore.nome}</strong>: ${giocatore.punti} Punti`;
+                li.style.padding = "10px";
+                li.style.borderBottom = "1px solid #ccc";
+                lista.appendChild(li);
+            });
+
+            if (dati.finePartita) {
+                document.getElementById('titolo-classifica').innerText = "Classifica Finale!";
+                document.getElementById('messaggio-prossimo-round').innerText = "La partita è finita.";
+            } else {
+                document.getElementById('titolo-classifica').innerText = "Classifica del Round";
+                document.getElementById('messaggio-prossimo-round').innerText = "Preparati per il prossimo round...";
+            }
+        });
+
+        socket.on('vincitoreFinale', (vincitore) => {
+            document.getElementById('titolo-classifica').innerHTML = `🏆 HA VINTO ${vincitore.nome.toUpperCase()}! 🏆`;
+            document.getElementById('btn-ricarica').classList.remove('nascosto');
+        });
+
+    </script>
+</body>
+</html>
